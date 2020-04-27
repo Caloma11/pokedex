@@ -3,10 +3,14 @@ package edu.cs50.harvard.pokedex;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -20,6 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.URL;
+
 public class PokemonActivity extends AppCompatActivity {
 
     private TextView nameTextView;
@@ -31,6 +38,7 @@ public class PokemonActivity extends AppCompatActivity {
     private Boolean caught;
     private Button buttonView;
     private String currentPokemonName;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +56,9 @@ public class PokemonActivity extends AppCompatActivity {
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
         buttonView = findViewById(R.id.catchButton);
-
+        imageView = findViewById(R.id.pokeImg);
 
         load();
-
     }
 
 
@@ -64,6 +71,9 @@ public class PokemonActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
                 try {
                     String name = response.getString("name");
+                    JSONObject sprites = response.getJSONObject("sprites");
+                    String imageUrl = sprites.getString("front_default");
+
                     nameTextView.setText(name.substring(0, 1).toUpperCase() + name.substring(1));
                     numberTextView.setText(String.format("#%03d", response.getInt("id")));
 
@@ -81,6 +91,8 @@ public class PokemonActivity extends AppCompatActivity {
                             type2TextView.setText(type);
                         }
                     }
+                    new DownloadSpriteTask().execute(imageUrl);
+
                 } catch (JSONException e) {
                     Log.e("cs50", "Pokemon json error", e);
                 }
@@ -121,6 +133,26 @@ public class PokemonActivity extends AppCompatActivity {
             buttonView.setText("Catch!");
         }
 
+    }
+
+
+    private class DownloadSpriteTask extends AsyncTask<String, Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            try {
+                URL url = new URL(strings[0]);
+                return BitmapFactory.decodeStream(url.openStream());
+            }
+            catch (IOException e) {
+                Log.e("cs50", "Download sprite error", e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            imageView.setImageBitmap(bitmap);
+        }
     }
 
 }
