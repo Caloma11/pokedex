@@ -39,6 +39,7 @@ public class PokemonActivity extends AppCompatActivity {
     private Button buttonView;
     private String currentPokemonName;
     private ImageView imageView;
+    private TextView descriptionView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +58,10 @@ public class PokemonActivity extends AppCompatActivity {
         type2TextView = findViewById(R.id.pokemon_type2);
         buttonView = findViewById(R.id.catchButton);
         imageView = findViewById(R.id.pokeImg);
+        descriptionView = findViewById(R.id.description);
 
         load();
+        loadDescription();
     }
 
 
@@ -153,6 +156,47 @@ public class PokemonActivity extends AppCompatActivity {
         protected void onPostExecute(Bitmap bitmap) {
             imageView.setImageBitmap(bitmap);
         }
+    }
+
+
+    public void loadDescription() {
+
+        descriptionView.setText("");
+
+        String descriptionUrl = url.replace("pokemon", "pokemon-species");
+
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, descriptionUrl, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray descriptions = response.getJSONArray("flavor_text_entries");
+                    for (int i = 0; i < descriptions.length(); i++) {
+
+                        JSONObject wholeObject = descriptions.getJSONObject(i);
+                        JSONObject languageObject = wholeObject.getJSONObject("language");
+                        String languageName = languageObject.getString("name");
+
+
+                        if (languageName.equals("en")) {
+                            descriptionView.setText(wholeObject.getString("flavor_text"));
+                            break;
+                        }
+                    }
+
+
+                } catch (JSONException e) {
+                    Log.e("cs50", "Pokemon Description json error", e);
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("cs50", "json error");
+            }
+        });
+        requestQueue.add(request);
     }
 
 }
