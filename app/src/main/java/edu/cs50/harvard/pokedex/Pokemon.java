@@ -2,15 +2,15 @@ package edu.cs50.harvard.pokedex;
 
 public class Pokemon {
     private String name;
-    private int number;
+    private String url;
 
-    Pokemon(String name, int number) {
+    Pokemon(String name, String url) {
         this.name = name;
-        this.number = number;
+        this.url = url;
     }
 
-    public int getNumber() {
-        return number;
+    public String getUrl() {
+        return url;
     }
 
     public String getName() {
