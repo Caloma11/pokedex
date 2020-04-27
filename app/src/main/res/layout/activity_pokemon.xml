@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".PokemonActivity">
+
+    <ImageView
+        android:layout_height="200dp"
+        android:layout_width="match_parent"
+
+        android:textAlignment="center"
+        android:id="@+id/pokeImg">
+    </ImageView>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,6 +31,7 @@
         android:textSize="16dp"
         android:paddingTop="5dp"
         />
+
 
     <TextView
         android:layout_width="match_parent"
