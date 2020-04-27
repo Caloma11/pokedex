@@ -2,8 +2,11 @@ package edu.cs50.harvard.pokedex;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -25,6 +28,9 @@ public class PokemonActivity extends AppCompatActivity {
     private TextView type2TextView;
     private String url;
     private RequestQueue requestQueue;
+    private Boolean caught;
+    private Button buttonView;
+    private String currentPokemonName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +40,18 @@ public class PokemonActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         url = getIntent().getStringExtra("url");
+        currentPokemonName = getIntent().getStringExtra("currentPokemon");
+
+
         nameTextView = findViewById(R.id.pokemon_name);
         numberTextView = findViewById(R.id.pokemon_number);
         type1TextView = findViewById(R.id.pokemon_type1);
         type2TextView = findViewById(R.id.pokemon_type2);
+        buttonView = findViewById(R.id.catchButton);
+
 
         load();
+
     }
 
 
@@ -51,7 +63,8 @@ public class PokemonActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    nameTextView.setText(response.getString("name"));
+                    String name = response.getString("name");
+                    nameTextView.setText(name.substring(0, 1).toUpperCase() + name.substring(1));
                     numberTextView.setText(String.format("#%03d", response.getInt("id")));
 
 
@@ -80,5 +93,34 @@ public class PokemonActivity extends AppCompatActivity {
             }
         });
         requestQueue.add(request);
+        checkPreferences();
     }
+
+    public void toggleCatch(View view) {
+        if (caught) {
+            caught = false;
+            buttonView.setText("Catch!");
+            getPreferences(Context.MODE_PRIVATE).edit().putBoolean(currentPokemonName, false).commit();
+        }
+        else {
+            caught = true;
+            buttonView.setText("Release!");
+            getPreferences(Context.MODE_PRIVATE).edit().putBoolean(currentPokemonName, true).commit();
+        }
+    }
+
+
+    private void checkPreferences() {
+        caught = getPreferences(Context.MODE_PRIVATE).getBoolean(currentPokemonName, false);
+
+
+        if (caught == true) {
+            buttonView.setText("Release!");
+        }
+        else if (!caught) {
+            buttonView.setText("Catch!");
+        }
+
+    }
+
 }

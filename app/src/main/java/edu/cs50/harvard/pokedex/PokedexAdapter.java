@@ -51,6 +51,7 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
                     Pokemon current = (Pokemon) containerView.getTag();
                     Intent intent = new Intent(v.getContext(), PokemonActivity.class);
                     intent.putExtra("url", current.getUrl());
+                    intent.putExtra("currentPokemon", current.getName());
                     v.getContext().startActivity(intent);
                 }
 
@@ -85,14 +86,12 @@ public class PokedexAdapter extends RecyclerView.Adapter<PokedexAdapter.PokedexV
             FilterResults results = new FilterResults();
             results.values = filteredPokemon;
             results.count = filteredPokemon.size();
-            Log.d("peri", "fui chamado");
             return results;
         }
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             filtered = (List<Pokemon>) results.values;
-            Log.d("peri", "fui chamado");
             notifyDataSetChanged();
         }
     }
